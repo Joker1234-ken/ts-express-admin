@@ -1,5 +1,5 @@
 import express, { Express } from 'express'
-import userRouter from './user'
+import userRouter from '../controllers/user'
 
 export const setupRouter = (app: Express) => {
   const router = express.Router()
