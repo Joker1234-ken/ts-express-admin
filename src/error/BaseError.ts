@@ -1,9 +1,9 @@
 class BaseError extends Error {
   code: number
-  constructor(message: string | undefined) {
+  constructor(message?: string, code?: number) {
     super()
-    this.message = message || ''
-    this.code = 1001
+    this.message = message || '服务器错误'
+    this.code = code || 500
   }
 }
 

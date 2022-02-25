@@ -1,14 +1,15 @@
-import { setupRouter } from './router/index'
+import { autoLoader } from './middleware/autoLoader'
 import express, { Express } from 'express'
-import { setupError } from './error/index'
+import { setupError } from './middleware/error'
+import { resolve } from './utils/tools'
 
 const app: Express = express()
 
 // 解析express request body参数
 app.use(express.json(), express.urlencoded({ extended: false }))
 
-// 路由控制器
-setupRouter(app)
+// 路由自动加载
+autoLoader(app, resolve('../controllers'))
 
 // 错误处理
 setupError(app)

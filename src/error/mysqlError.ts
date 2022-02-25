@@ -1,9 +1,7 @@
-class MysqlError extends Error {
-  code: number
+import BaseError from './BaseError'
+class MysqlError extends BaseError {
   constructor(message: string | undefined) {
-    super()
-    this.message = message || '数据库错误'
-    this.code = 1000
+    super(message || '数据库错误', 1000)
   }
 }
 

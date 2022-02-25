@@ -1,30 +1,19 @@
 import { Request, Response, NextFunction } from 'express'
-import userModel, { User } from './../modules/user'
-import { genSaltSync, hashSync } from 'bcryptjs'
+import JSONResponse from './../utils/data'
+import UserModule from './../modules/user.module'
+import { encrypt } from './../utils/tools'
 import BaseError from './../error/BaseError'
-class UserService {
-  public async list(req: Request, res: Response, next: NextFunction) {
+import { decode } from '../utils/tools'
+const model = new UserModule()
+
+export default class UserService {
+  public static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const users = await userModel.list()
+      const { page, pageSize } = req.body
 
-      res.json(users)
-    } catch (error) {
-      next(error)
-    }
-  }
+      const [data, [{ total }]]: any[] = await model.search({ page, pageSize })
 
-  public async create(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { password: pwd }: User = req.body
-
-      if (!pwd) throw new BaseError('密码不能为空')
-      // 随机字符串
-      const salt = genSaltSync(10)
-
-      // 对明文加密
-      const password = hashSync(pwd, salt)
-
-      const result = await userModel.create({ ...req.body, password })
+      const result = new JSONResponse({ total, data, page, pageSize })
 
       res.json(result)
     } catch (error) {
@@ -32,9 +21,13 @@ class UserService {
     }
   }
 
-  public async delete(req: Request, res: Response, next: NextFunction) {
+  public static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await userModel.delete(req.body)
+      req.body.password = encrypt(req.body.password)
+
+      await model.create(req.body)
+
+      const result = new JSONResponse()
 
       res.json(result)
     } catch (error) {
@@ -42,9 +35,11 @@ class UserService {
     }
   }
 
-  public async update(req: Request, res: Response, next: NextFunction) {
+  public static async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await userModel.update(req.body)
+      await model.delete(req.body.id)
+
+      const result = new JSONResponse()
 
       res.json(result)
     } catch (error) {
@@ -52,9 +47,31 @@ class UserService {
     }
   }
 
-  public async login(req: Request, res: Response, next: NextFunction) {
+  public static async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await userModel.detail(req.body)
+      req.body.password = encrypt(req.body.password)
+
+      await model.update(req.body.id, req.body)
+
+      const result = new JSONResponse()
+
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public static async login(req: Request, res: Response, next: NextFunction) {
+    try {
+      const [user] = await model.detail(req.body)
+
+      if (!user) throw new BaseError('账号不存在', 1001)
+
+      if (!decode(req.body.password, user.password)) {
+        throw new BaseError('密码错误', 1001)
+      }
+
+      const result = new JSONResponse({ token: '123123' })
 
       res.json(result)
     } catch (error) {
@@ -62,5 +79,3 @@ class UserService {
     }
   }
 }
-
-export default new UserService()

@@ -1,9 +1,7 @@
-class NotFound extends Error {
-  code: number
+import BaseError from './BaseError'
+class NotFound extends BaseError {
   constructor() {
-    super()
-    this.message = '请求错误,查看请求链接或者请求方式是否错误!'
-    this.code = 404
+    super('请求错误,查看请求链接或者请求方式是否错误!', 404)
   }
 }
 

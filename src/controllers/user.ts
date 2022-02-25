@@ -1,16 +1,26 @@
 import express, { Router } from 'express'
 import userService from '../services/user.service'
+import { validator } from './../middleware/validator'
 
-const userRouter: Router = express.Router()
+const user: Router = express.Router()
 
-userRouter.get('/', userService.list)
+const userOptions = {
+  username: 'string',
+  password: 'string'
+}
 
-userRouter.post('/', userService.create)
+user.post('/', validator(userOptions), userService.create)
 
-userRouter.delete('/', userService.delete)
+user.post('/login', validator(userOptions), userService.login)
 
-userRouter.put('/', userService.update)
+user.delete('/', validator({ id: 'number' }), userService.delete)
 
-userRouter.post('/login', userService.login)
+user.put('/', validator({ id: 'number', ...userOptions }), userService.update)
 
-export default userRouter
+user.post(
+  '/list',
+  validator({ pageSize: 'number', page: 'number' }),
+  userService.list
+)
+
+export { user }
