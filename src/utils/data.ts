@@ -1,24 +1,12 @@
-class JSONResponse {
-  code: number
-  message: string
+class Response {
+  code: number = 0
+  message: string = 'ok'
   data: any
-  constructor(data?: any, message?: string, code?: number) {
-    this.data = data || null
-    this.code = code || 0
-    this.message = message || 'ok'
-  }
-
-  setData(data?: any | any[]) {
-    this.data = data || null
-  }
-
-  setCode(code?: number) {
-    this.code = code || 0
-  }
-
-  setMessage(message?: string) {
-    this.message = message || 'ok'
+  constructor(data?: any) {
+    this.data = data
   }
 }
 
-export default JSONResponse
+export const apiResponse = (data?: any) => {
+  return new Response(data)
+}

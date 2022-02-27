@@ -6,3 +6,5 @@ export const mysqlConfig = {
   database: 'test', // 数据库
   connectTimeout: 5000 // 连接超时
 }
+
+export const secret = 'secret'

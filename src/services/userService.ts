@@ -1,19 +1,21 @@
+import { createToken } from './../utils/tools'
 import { Request, Response, NextFunction } from 'express'
-import JSONResponse from './../utils/data'
-import UserModule from './../modules/user.module'
-import { encrypt } from './../utils/tools'
-import BaseError from './../error/BaseError'
-import { decode } from '../utils/tools'
-const model = new UserModule()
+import { apiResponse } from '../utils/data'
+import UserModule from '../modules/userModule'
+import { encrypt, decode } from '../utils/tools'
+import BaseError from '../error/BaseError'
 
 export default class UserService {
   public static async list(req: Request, res: Response, next: NextFunction) {
     try {
       const { page, pageSize } = req.body
 
-      const [data, [{ total }]]: any[] = await model.search({ page, pageSize })
+      const [data, [{ total }]]: any[] = await UserModule.search({
+        page,
+        pageSize
+      })
 
-      const result = new JSONResponse({ total, data, page, pageSize })
+      const result = apiResponse({ total, page, pageSize, data })
 
       res.json(result)
     } catch (error) {
@@ -25,11 +27,9 @@ export default class UserService {
     try {
       req.body.password = encrypt(req.body.password)
 
-      await model.create(req.body)
+      await UserModule.create(req.body)
 
-      const result = new JSONResponse()
-
-      res.json(result)
+      res.json(apiResponse())
     } catch (error) {
       next(error)
     }
@@ -37,11 +37,9 @@ export default class UserService {
 
   public static async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await model.delete(req.body.id)
+      await UserModule.delete(req.body.id)
 
-      const result = new JSONResponse()
-
-      res.json(result)
+      res.json(apiResponse())
     } catch (error) {
       next(error)
     }
@@ -51,11 +49,9 @@ export default class UserService {
     try {
       req.body.password = encrypt(req.body.password)
 
-      await model.update(req.body.id, req.body)
+      await UserModule.update(req.body.id, req.body)
 
-      const result = new JSONResponse()
-
-      res.json(result)
+      res.json(apiResponse())
     } catch (error) {
       next(error)
     }
@@ -63,19 +59,27 @@ export default class UserService {
 
   public static async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const [user] = await model.detail(req.body)
+      const [user] = await UserModule.detail(req.body)
 
-      if (!user) throw new BaseError('账号不存在', 1001)
+      if (!user) throw new BaseError('账号不存在')
 
       if (!decode(req.body.password, user.password)) {
-        throw new BaseError('密码错误', 1001)
+        throw new BaseError('密码错误')
       }
 
-      const result = new JSONResponse({ token: '123123' })
+      const token = createToken({ username: user.username })
+
+      const result = apiResponse({ token })
 
       res.json(result)
     } catch (error) {
       next(error)
     }
+  }
+
+  public static async getInfo(req: Request, res: Response, next: NextFunction) {
+    const result = apiResponse()
+
+    res.json(result)
   }
 }

@@ -12,6 +12,6 @@ export const setupError = (app: Express) => {
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     res
       .status(200)
-      .json(err instanceof BaseError ? err : new BaseError(err.message))
+      .json(err instanceof BaseError ? err : new BaseError(err.message, 500))
   })
 }
