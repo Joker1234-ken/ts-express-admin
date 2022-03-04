@@ -1,6 +1,6 @@
 import express from 'express'
 import { check, ValidationError, validationResult } from 'express-validator'
-import BaseError from './../error/BaseError'
+import { error } from '../utils/setupData'
 import { isType } from './../utils/tools'
 
 export const validator = (valid: any, validList: any[] = []): any[] => {
@@ -43,7 +43,7 @@ export const validator = (valid: any, validList: any[] = []): any[] => {
       const errors = validationResult(req).formatWith(errorFormatter)
 
       if (!errors.isEmpty()) {
-        return next(new BaseError(errors.array()[0], 400))
+        return next(error(errors.array()[0], 400))
       }
 
       next()

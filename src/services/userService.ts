@@ -1,9 +1,8 @@
 import { createToken } from './../utils/tools'
 import { Request, Response, NextFunction } from 'express'
-import { apiResponse } from '../utils/data'
+import { responseData, error } from '../utils/setupData'
 import UserModule from '../modules/userModule'
 import { encrypt, decode } from '../utils/tools'
-import BaseError from '../error/BaseError'
 
 export default class UserService {
   public static async list(req: Request, res: Response, next: NextFunction) {
@@ -15,7 +14,7 @@ export default class UserService {
         pageSize
       })
 
-      const result = apiResponse({ total, page, pageSize, data })
+      const result = responseData({ total, page, pageSize, data })
 
       res.json(result)
     } catch (error) {
@@ -29,7 +28,7 @@ export default class UserService {
 
       await UserModule.create(req.body)
 
-      res.json(apiResponse())
+      res.json(responseData())
     } catch (error) {
       next(error)
     }
@@ -39,7 +38,7 @@ export default class UserService {
     try {
       await UserModule.delete(req.body.id)
 
-      res.json(apiResponse())
+      res.json(responseData())
     } catch (error) {
       next(error)
     }
@@ -51,7 +50,7 @@ export default class UserService {
 
       await UserModule.update(req.body.id, req.body)
 
-      res.json(apiResponse())
+      res.json(responseData())
     } catch (error) {
       next(error)
     }
@@ -61,15 +60,13 @@ export default class UserService {
     try {
       const [user] = await UserModule.detail(req.body)
 
-      if (!user) throw new BaseError('账号不存在')
+      if (!user) throw error('账号不存在')
 
-      if (!decode(req.body.password, user.password)) {
-        throw new BaseError('密码错误')
-      }
+      if (!decode(req.body.password, user.password)) throw error('密码错误')
 
       const token = createToken({ username: user.username })
 
-      const result = apiResponse({ token })
+      const result = responseData({ token })
 
       res.json(result)
     } catch (error) {
@@ -78,7 +75,7 @@ export default class UserService {
   }
 
   public static async getInfo(req: Request, res: Response, next: NextFunction) {
-    const result = apiResponse()
+    const result = responseData()
 
     res.json(result)
   }

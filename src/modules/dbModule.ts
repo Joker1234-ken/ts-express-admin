@@ -8,7 +8,7 @@ import {
   format
 } from 'mysql'
 import { isType } from '../utils/tools'
-import MError from '../error/mysqlError'
+import { error } from '../utils/setupData'
 
 // 用 createConnection 创建 Mysql 连接，每执行一次 connection.query 都是一个全新的连接，会造成一个资源的极大浪费，降低性能。
 
@@ -27,11 +27,11 @@ class BaseMysql {
     return new Promise((resolve, reject) => {
       this.pool.getConnection((err: MysqlError, connection: PoolConnection) => {
         if (err) {
-          reject(new MError(err.sqlMessage))
+          reject(error(err.sqlMessage, 1001))
         } else {
           connection.query(sql, (err: MysqlError, result: any) => {
             if (err) {
-              reject(new MError(err.sqlMessage))
+              reject(error(err.sqlMessage, 1001))
             } else {
               resolve(result)
             }
@@ -90,8 +90,6 @@ class InitMysql extends BaseMysql {
     }
 
     const sql = `select ${this.row} from ${this.table} ${this.wheres} ${this.limits}`
-
-    console.log(sql)
 
     return this.conn(sql, this.values)
   }
