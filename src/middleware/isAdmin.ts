@@ -17,6 +17,7 @@ export const isAdmin = (
   const user = verify(token, secret)
 
   if (!user) throw error('token失效', 401)
+  ;(req as any).user = user
 
   next()
 }

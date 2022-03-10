@@ -13,6 +13,7 @@ export const setupError = (app: Express) => {
     log4js(
       JSON.stringify({
         message: 'error',
+        method: req.method,
         path: req.path,
         error: err
       })

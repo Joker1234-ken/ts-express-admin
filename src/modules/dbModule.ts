@@ -20,7 +20,7 @@ class BaseMysql {
     this.pool = createPool(config)
   }
 
-  public conn(sql: string = '', values: any[] = []): Promise<any> {
+  public async conn(sql: string = '', values: any[] = []): Promise<any> {
     if (values.length > 0) {
       sql = format(sql, values)
     }
@@ -30,13 +30,13 @@ class BaseMysql {
           reject(error(err.sqlMessage, 1001))
         } else {
           connection.query(sql, (err: MysqlError, result: any) => {
+            connection.release()
             if (err) {
               reject(error(err.sqlMessage, 1001))
             } else {
               resolve(result)
             }
           })
-          connection.release()
         }
       })
     })

@@ -42,7 +42,8 @@
     "glob": "^7.2.0",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^6.4.1",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "typeorm": "^0.2.45"
   },
   "config": {
     "commitizen": {

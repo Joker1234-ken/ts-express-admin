@@ -75,7 +75,11 @@ export default class UserService {
   }
 
   public static async getInfo(req: Request, res: Response, next: NextFunction) {
-    const result = responseData()
+    const result = responseData({
+      user: (req as any).user.payload,
+      roles: [],
+      permissions: []
+    })
 
     res.json(result)
   }
